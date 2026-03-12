@@ -1,0 +1,37 @@
+# Dependências
+node_modules/
+venv/
+__pycache__/
+*.pyc
+target/
+.mvn/
+
+# Build
+build/
+dist/
+*.jar
+*.war
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+
+# Uploads
+uploads/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.sqlite

@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: modernsite-db
+    environment:
+      POSTGRES_DB: modernsite
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - modernsite-network
+
+  # Java Backend (Spring Boot)
+  backend-java:
+    build: ./backend-java
+    container_name: modernsite-backend-java
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/modernsite
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - modernsite-network
+
+  # Python Backend (FastAPI)
+  backend-python:
+    build: ./backend-python
+    container_name: modernsite-backend-python
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend-python/uploads:/app/uploads
+    networks:
+      - modernsite-network
+
+  # Frontend (React)
+  frontend:
+    build: ./frontend
+    container_name: modernsite-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:8080/api
+    depends_on:
+      - backend-java
+      - backend-python
+    networks:
+      - modernsite-network
+
+volumes:
+  postgres_data:
+
+networks:
+  modernsite-network:
+    driver: bridge
